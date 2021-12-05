@@ -1,0 +1,138 @@
+---
+title: "Midterm Part Two - Thomas"
+author: "Thomas Raines"
+date: "10/1/2021"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+##Install the readr package for reading tsvs
+library("readr") ## load the readr packages into R
+
+
+library("tidyverse")
+
+
+library("lubridate")
+
+library("ggplot2")
+
+
+library("dplyr")
+
+library("scales")
+
+```
+
+
+```{r}
+getwd() ## show my working directory
+setwd("C:/Users/Proje/OneDrive/Desktop/Data Analytics Projects/Midterm Part Two") ## Set my working directory to where I want to work
+
+```
+
+
+
+```{r}
+## Read in the tsv file that you choose from your Working directory
+tsv_read = read_tsv(file.choose())
+
+## View our TSV file
+
+tsv_read
+##View head of the TSV file
+head(tsv_read)
+
+## Inspect the tsv file's structure
+str(tsv_read)
+
+
+##Convert the tsv Into a DataFrame
+
+df_var = data.frame(tsv_read)
+
+
+#Structure of the Variance Df
+str(df_var)
+
+
+
+```
+
+
+
+```{r}
+#Format the Collection Date as a date and not a character format
+df_var$Collection.date = as.Date(df_var$Collection.date, format = "%Y-%m-%d")
+str(df_var)
+
+
+
+```
+
+
+```{r}
+## Now I made a new column with all of my dates floored so we can group them by month
+
+
+
+plot_data = df_var
+plot_data$flooredDate = floor_date(plot_data$Submission.date, "month")
+
+##Changed Date and Clade into factors
+
+
+plot_data$Clade = as.factor(plot_data$Clade)
+
+##Make a DF with only these three Columns
+
+plot_data_refined = plot_data %>% select("Clade", "N.Content" , "flooredDate")
+
+
+##Add column for dating purposes (x-axis)
+plot_data_refined$dateCopy = plot_data_refined$flooredDate
+
+
+##Make our copy as a Date
+plot_data_refined$dateCopy = format(as.Date(plot_data_refined$dateCopy, format = "%y-%m-%d"), "%Y-%m")
+
+
+
+
+##make the date a factor so we can elliminate the individual dates and just plot by months
+plot_data_refined$dateCopy = as.factor(plot_data_refined$dateCopy)
+
+
+
+
+
+```
+
+
+
+
+
+```{r}
+variant_plotz = ggplot(plot_data_refined, aes(x= `dateCopy`,  fill = Clade)) +
+  geom_bar( position = "fill") +
+  
+  
+  ##Limit the y axis from 0 to 1
+  ylim(0.0, 1) +
+  xlab("Dates")+
+  ylab("n")+
+  
+  theme(axis.text.x = element_text(angle=60, hjust=1))
+
+##Plot our data
+variant_plotz
+
+```
+
+
+
